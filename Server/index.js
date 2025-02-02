@@ -18,7 +18,7 @@ const router = require("./AuthRoutes/Router")
 
 
 app.use(cors({
-    origin:["http://localhost:3000"],
+    origin:["https://sgf-logistics.vercel.app/"],
     credentials: true,
     methods:["POST,GET,PUT,DELETE"], 
     allowedHeaders: ["Content-Type"] // Common headers
@@ -56,7 +56,7 @@ app.post('/add-admin', async (req, res) => {
         secure: true,
         auth: {
             user: process.env.EMAIL,//email that will be sending messages from the server to the client
-            pass: process.env.PASSWORD  //generated password form less secured apps from Google
+            pass: process.env.EMAIL_PASSWORD  //generated password form less secured apps from Google
         },
         tls: {
             rejectUnauthorized: false, //do not reject self-signed certificates  

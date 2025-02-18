@@ -52,7 +52,9 @@ app.post('/add-admin', async (req, res) => {
     }
   });
 
-  
+  app.get('/new', (req, res) => {
+    res.send('Hello World');
+  });
   
      
 

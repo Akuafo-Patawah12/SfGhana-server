@@ -18,10 +18,10 @@ const router = require("./Router/Router")
 
 
 app.use(cors({
-    origin:["https://sgf-logistics.vercel.app/"],
+    origin: "https://sgf-logistics.vercel.app", // Make sure this matches exactly
+    methods: "GET,POST,PUT,DELETE,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
     credentials: true,
-    methods:["POST,GET,PUT,DELETE"], 
-    allowedHeaders: ["Content-Type"] // Common headers
 }))
 
 

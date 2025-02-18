@@ -1,41 +1,96 @@
- const Order= require("../DatabaseModels/Order")
- const User= require("../DatabaseModels/UsersSchema")
+ const Order= require("../Models/Order")
+ const User= require("../Models/UsersSchema")
+ const moment = require('moment');
+ 
 
 const orderFunc=(socket,adminNamespace,users)=>{
     
+  socket.on("joinRoom", (roomName) => {
+    if (roomName) {
+      socket.join(roomName);
+      console.log(`Socket ${socket.id} joined room: ${roomName}`);
+    } else {
+      console.log("Room name is required to join a room.");
+    }
+  });
 
-    socket.on("createOrder", async(data) => { //receiving createOrders data from clientside
-        console.log(data)
-     
+
+  socket.on("createOrder",async(data,callback)=>{
+    const user_id= socket.user.id
+      console.log(data)
+      try {
+        const orders = new Order({ ...data, userId: user_id }); // Include userId in the order
+        await orders.save();
+          await orders.save();
+          console.log("Shipment created successfully", orders);
+          callback({ status: "ok" })
+          socket.to("adminRoom").emit('newOrder', orders)
+      } catch (error) {
+          console.error("Error creating shipment", error);
+          callback({ status: "error", message: error.message })
+      }
+  })
+
+  
+
+    socket.on("submitOrder", (data, callback) => {
+        console.log("Received shipment data:", data);
+        
+        // Save to database (Example with MongoDB)
+        data.date = moment(data.date, 'DD-MM-YY').toDate(); // Convert to Date object
+        new Order(data)
+            .save()
+            .then(() => callback({ status: "ok" }))
+            .catch((err) =>{
+                 callback({ status: "error", message: err.message })
+                   console.log(err)
+                 }
+                 );
+
+      });
+
+      socket.on("getOrdersByUser", async (data,callback) => {
+        const userId= socket.user.id
+        
         try {
-            //Inserting new data received from clientside in to orders table
-
-            const order = new Order({ 
-                fullname:data.fullname,
-                email: data.email,
-                phone: parseInt(data.phone),
-                additional_info: data.additional_info,
-                items:data.items,
-                origin:data.origin,
-                 destination:data.destination,
-                 tracking_id: data.tracking_id,
-                 totalAmount: data.length 
-                });// creating new order
-
-            await order.save();  // saving new order the database
-            
-            socket.emit("receive",order) //send this data the user connected to this namespace
-            adminNamespace.in("AdminRoom").emit("receivedOrder", {_id: order._id,...order,Status: order.Status}); // Emit to all in "/order" room
-            
-        }catch(err) {
-            console.error("Error saving order or emitting event:", err);
+          const orders = await Order.find({ userId }).sort({ createdAt: -1 }); // Fetch orders by user ID
+          console.log(orders)
+          socket.emit("ordersByUser", orders); // Send the orders back to the client
+        } catch (error) {
+          callback( {status:"error" ,message: "Failed to fetch orders", error });
         }
-});
+      });
+
+
+      socket.on("cancelOrder", async (orderId,callback) => {
+        try {
+          const order = await Order.findById(orderId);
+      
+          if (!order) {
+            callback({status:"error",message:"Order doesn't exist"})
+            return;
+          }
+      
+          if (order.status !== "Pending...") {
+            callback({status:"error",message:"Cannot delete order"})
+            return;
+          }
+      
+          order.status = "Cancelled";
+          await order.save();
+          callback({status:"ok",message:"Order cancelled"})
+          console.log("Order cancelled successfully:", order);
+        } catch (error) {
+          console.error("Error updating order status:", error);
+          callback({status:"error",message:"Error updating order status"})
+        }
+      
+      });
 
     socket.on("allOrders",async(id)=>{
         try{
             //find all Orders with this particular customer's id
-             const orders= await Order.find({customer_id:id}) 
+             const orders= await Order.find({user_id:id}) 
             
              socket.emit("getOrders",orders) // sending orders of all user to myself
         }catch(error){

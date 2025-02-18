@@ -1,17 +1,16 @@
-const bcrypt= require("bcrypt")
-const jwt= require("jsonwebtoken")
+
 const data= require("../Models/UsersSchema")
 require("dotenv").config()
 const UAParser= require("ua-parser-js")
-const sendVerificationEmail = require("./SendOTP")
-const sendCookie = require("../Utils/Cookie")
+const transport = require("../Utils/MailTransporter");
 
 
-async function login(req,res){
+
+async function resendOtp(req,res){
    
     
-    const {email,password,rememberMe }= req.body.formData   //grabing user credentials from the client side.
-     console.log({email,password,rememberMe })
+    const {email }= req.body.formData   //grabing user credentials from the client side.
+     console.log({email})
      const userAgent = req.headers["user-agent"];
        const parser = new UAParser(userAgent);
        
@@ -48,7 +47,29 @@ async function login(req,res){
         if (email_Exist && email_Exist.device_info.includes(userDeviceInfo)) {
             console.log("Device info already exists for this user.");
           } else {
-                await sendVerificationEmail(email,otp)
+            let transporter= transport()
+  
+            let mailOptions = {
+              from: `"SF Ghana Logistics" <${process.env.EMAIL}>`,
+              to: email,
+              subject: "New Device Login - Verification Code",
+              html: `
+                <p>We noticed a login attempt from a new device or browser.</p>
+                <p><strong>Your verification code is:</strong> <span style="font-size: 18px; font-weight: bold;">${code}</span></p>
+                <p>If this wasn't you, please <a href="https://yourwebsite.com/security">secure your account</a> immediately.</p>
+                <p>Best regards,<br>Your SF Ghana Logistics Ltd</p>
+              `,
+        
+              replyTo: process.env.EMAIL,
+            };
+          
+            transporter.sendMail(mailOptions, (error, info) => {
+              if (error) {
+                console.error("Error sending email:", error);
+              } else {
+                console.log("Verification email sent:", info.response);
+              }
+            });
             
                 email_Exist.verification_code= otp
                 email_Exist.code_expires_at= Date.now() + 10 * 60 * 1000  // Code expires in 10 min
@@ -57,45 +78,15 @@ async function login(req,res){
           };
         
 
-        const password_Is_Correct = await  bcrypt.compare(password, email_Exist.password);
-       
-         const protected= email_Exist.account_type // find the user's account type "whether it's a personal or business account"
-
-         const payload = {
-            id: email_Exist._id, // Example user ID
-            iat: Math.floor(Date.now() / 1000) // Set issued at timestamp
-            
-          };
-         const access_token= jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET,{
-            expiresIn: '15m', // create an access cookie for authorization  
-        })
+        
 
         
        
-        if (!password_Is_Correct) {
-            return res.status(401).json({ message: 'Invalid password' }); // Incorrect password
-        }
+        
 
-        switch (protected) {
-            case "User":
-                sendCookie(payload,rememberMe,res) // Set the refresh token cookie
-                return res.json({
-                    message: "Logged in as a client",
-                    accessToken: access_token
-                });
-
-            case "Admin":
-                sendCookie(payload,rememberMe,res); // Set the refresh token cookie
-                return res.json({
-                    message: "Logged in as an admin",
-                    accessToken: access_token
-                });
-
-            default:
-                return res.status(400).json({ message: 'Invalid account type' }); // Unexpected account type
-        }
+       
     }catch(err){
         console.log(err)
        return res.status(500).json(err) //Console 500 error message if server crashes
     }}
-module.exports={login}
+module.exports= resendOtp

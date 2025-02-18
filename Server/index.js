@@ -47,7 +47,9 @@ app.post('/add-admin', async (req, res) => {
     res.send('Hello World');
   });
   
-     
+  app.post("/test", (req, res) => {
+    res.json({ message: "POST request received" });
+});   
 
 const server= http.createServer(app)
 

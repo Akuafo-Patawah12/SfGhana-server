@@ -18,11 +18,15 @@ const router = require("./Router/Router")
 
 
 const corsOptions = {
-  origin: 'https://sgf-logistics.vercel.app',
-  methods: ['GET', 'POST', 'DELETE', 'UPDATE'],
-  credentials: true,
+  origin: "https://sgf-logistics.vercel.app",
+  methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],  // ✅ Add OPTIONS
+  allowedHeaders: ["Content-Type", "Authorization"],  // ✅ Allow required headers
+  credentials: true
 };
+
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));  // ✅ Handle OPTIONS requests
+
 
 
 

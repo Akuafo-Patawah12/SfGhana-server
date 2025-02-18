@@ -50,7 +50,7 @@ const server= http.createServer(app)
 initializeSocket(server)  // This function return all the websockets
 
 
-const port= process.env.PORT || 4040
+const port= process.env.PORT || 5000
 
 async function start_Server(){
 try{

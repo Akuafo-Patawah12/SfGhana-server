@@ -17,23 +17,14 @@ const router = require("./Router/Router")
 
 
 
-const allowedOrigins = [
-  'https://sgf-logistics.vercel.app'
-];
-
 const corsOptions = {
-  origin: function (origin, callback) {
-      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-          callback(null, true);
-      } else {
-          callback(new Error('Not allowed by CORS'));
-      }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: 'https://sgf-logistics.vercel.app',
+  methods: ['GET', 'POST', 'DELETE', 'UPDATE'],
+  credentials: true,
 };
-
 app.use(cors(corsOptions));
+
+
 
 
   

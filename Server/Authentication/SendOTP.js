@@ -16,7 +16,7 @@ try{
         <p>We noticed a login attempt from a new device or browser.</p>
         <p><strong>Your verification code is:</strong> <span style="font-size: 18px; font-weight: bold;">${code}</span></p>
         <p>If this wasn't you, please <a href="https://yourwebsite.com/security">secure your account</a> immediately.</p>
-        <p>Best regards,<br>Your SF Ghana Logistics Ltd</p>
+        <p>Best regards,<br>SF Ghana Logistics Ltd</p>
       `,
 
       replyTo: process.env.EMAIL,

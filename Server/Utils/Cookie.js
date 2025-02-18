@@ -13,7 +13,7 @@ function sendCookie(payload,rememberMe,res){
         httpOnly: true,   // Ensures that the cookie is only accessible via HTTP(S) requests
         path: '/',        // Specifies the path for which the cookie is valid
         secure: true,          // Indicates that the cookie should only be sent over HTTPS
-        sameSite: "Lax", // Controls cross-site behavior
+        sameSite: "None", // Controls cross-site behavior
         maxAge: rememberMe ? 30 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000 // 30 days or 1 hour
 });   
 }

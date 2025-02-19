@@ -42,6 +42,7 @@ function initializeSocket(server){
           jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => { 
             if (err) return next(new Error("404: Refresh token not found"));
             socket.user = user; // Attach user to the socket
+            console.log(socket.user)
             next(); //proceed if there's no error
           });
         

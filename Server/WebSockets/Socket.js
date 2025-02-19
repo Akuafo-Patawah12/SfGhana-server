@@ -82,7 +82,7 @@ function initializeSocket(server){
       try {
         const decoded = socket.user
     
-        if (decoded.role !== "admin") {
+        if (decoded.role !== "Admin") {
           return next(new Error("403: Unauthorized role"));
         }
     

@@ -45,6 +45,11 @@ async function login(req,res){
         return res.status(404).json({ message: "Invalid email" }); // Email not found
           
         }
+
+        const password_Is_Correct = await  bcrypt.compare(password, email_Exist.password);
+        if (!password_Is_Correct) {
+            return res.status(401).json({ message: 'Invalid password' }); // Incorrect password
+        }
         if (email_Exist && email_Exist.device_info.includes(userDeviceInfo)) {
             console.log("Device info already exists for this user.");
           } else {
@@ -57,7 +62,7 @@ async function login(req,res){
           };
         
 
-        const password_Is_Correct = await  bcrypt.compare(password, email_Exist.password);
+        
        
          const protected= email_Exist.account_type // find the user's account type "whether it's a personal or business account"
 
@@ -72,9 +77,7 @@ async function login(req,res){
 
         
        
-        if (!password_Is_Correct) {
-            return res.status(401).json({ message: 'Invalid password' }); // Incorrect password
-        }
+        
 
         switch (protected) {
             case "User":

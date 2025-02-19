@@ -33,7 +33,7 @@ function initializeSocket(server){
           return next(new Error('No cookies found'));
         }
       
-        if (cookieHeader) {
+       
           const cookies = cookie.parse(cookieHeader); // Parse cookies from the header
           const token = cookies.refreshToken; // Extract the refresh token
           if (!token) return next(new Error('404: Refresh token not found'));
@@ -44,9 +44,7 @@ function initializeSocket(server){
             socket.user = user; // Attach user to the socket
             next(); //proceed if there's no error
           });
-        } else {
-          next(new Error('401: Invalid refresh token'));
-        }
+        
       }
 
       const trackingNamespace= io.of("/tracking")
@@ -79,18 +77,17 @@ function initializeSocket(server){
      })
 
      shipmentNamespace.use((socket, next) => {
-      try {
-        const decoded = socket.user
-    
-        if (decoded.role !== "Admin") {
+      
+        if (!socket.user) {
+          return next(new Error("401: Invalid refresh token"));
+        }
+      
+        if (socket.user.role !== "Admin") {
           return next(new Error("403: Unauthorized role"));
         }
-    
-        
+      
         next();
-      } catch (err) {
-        return next(new Error("401: Invalid refresh token"));
-      }
+    
     });
 
      function setUser(socket){

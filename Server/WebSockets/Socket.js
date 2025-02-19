@@ -122,6 +122,7 @@ function initializeSocket(server){
       })
 
       shipmentNamespace.on("connection",(socket)=>{
+        console.log(socket.user.role)
         setUser(socket)
         Shipping(socket,shipmentNamespace,users)
 

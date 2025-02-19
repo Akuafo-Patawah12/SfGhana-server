@@ -65,7 +65,7 @@ async function login(req,res){
         
        
          const protected= email_Exist.account_type // find the user's account type "whether it's a personal or business account"
-
+         console.log(protected)
          const payload = {
             id: email_Exist._id, // Example user ID
             role: protected,

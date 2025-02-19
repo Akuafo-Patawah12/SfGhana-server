@@ -86,7 +86,7 @@ function initializeSocket(server){
             if (err) return next(new Error("404: Refresh token not found"));
             socket.user = user; // Attach user to the socket
             if (socket.user.role !== "Admin") {
-              return next(new Error(`403: Unauthorized role ${socket.user.role}`));
+              return next(new Error(`403: Unauthorized role ${socket.user}`));
             }
             next(); //proceed if there's no error
           });

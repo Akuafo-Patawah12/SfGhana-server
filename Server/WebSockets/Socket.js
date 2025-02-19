@@ -83,7 +83,7 @@ function initializeSocket(server){
         }
       
         if (socket.user.role !== "Admin") {
-          return next(new Error("403: Unauthorized role"));
+          return next(new Error("403: Unauthorized role",socket.user.role));
         }
       
         next();

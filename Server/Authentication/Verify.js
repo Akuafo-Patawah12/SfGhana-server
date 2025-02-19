@@ -7,6 +7,7 @@ const sendCookie = require("../Utils/Cookie");
   // **2️⃣ Verify OTP**
   const verify= async (req, res) => {
     const { email, otp } = req.body;
+    console.log({ email, otp ,otp})
 
     const userAgent = req.headers["user-agent"];
            const parser = new UAParser(userAgent);

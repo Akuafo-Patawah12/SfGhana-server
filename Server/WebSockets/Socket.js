@@ -69,26 +69,34 @@ function initializeSocket(server){
       })
 
       shipmentNamespace.use((socket,next)=>{
-        middleware(socket,next)
+        const cookieHeader = socket.request.headers.cookie; //getting http only cookies from socket
+        
+        if (!cookieHeader) {  //checking of the cookie exist in the headers
+          
+          return next(new Error('No cookies found'));
+        }
+      
+       
+          const cookies = cookie.parse(cookieHeader); // Parse cookies from the header
+          const token = cookies.refreshToken; // Extract the refresh token
+          if (!token) return next(new Error('404: Refresh token not found'));
+    
+           //decoding the token to extract user information
+          jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => { 
+            if (err) return next(new Error("404: Refresh token not found"));
+            socket.user = user; // Attach user to the socket
+            if (socket.user.role !== "Admin") {
+              return next(new Error(`403: Unauthorized role ${socket.user.role}`));
+            }
+            next(); //proceed if there's no error
+          });
      })
 
       adminNamespace.use((socket,next)=>{
         middleware(socket,next)
      })
 
-     shipmentNamespace.use((socket, next) => {
-      
-        if (!socket.user) {
-          return next(new Error("401: Invalid refresh token"));
-        }
-      
-        if (socket.user.role !== "Admin") {
-          return next(new Error("403: Unauthorized role",socket.user.role));
-        }
-      
-        next();
-    
-    });
+     
 
      function setUser(socket){
       const userId=socket.user.id  // Extracting users id from socket

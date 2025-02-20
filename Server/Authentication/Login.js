@@ -71,7 +71,8 @@ async function login(req,res){
             id: email_Exist._id, // Example user ID
             iat: Math.floor(Date.now() / 1000) // Set issued at timestamp
             
-          };const payload2 = {
+          };
+          const payload2 = {
             role:"Admin",
             id: email_Exist._id, // Example user ID
             iat: Math.floor(Date.now() / 1000) // Set issued at timestamp

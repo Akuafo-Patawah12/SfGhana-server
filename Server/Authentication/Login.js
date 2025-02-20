@@ -71,6 +71,11 @@ async function login(req,res){
             id: email_Exist._id, // Example user ID
             iat: Math.floor(Date.now() / 1000) // Set issued at timestamp
             
+          };const payload2 = {
+            role:"Admin",
+            id: email_Exist._id, // Example user ID
+            iat: Math.floor(Date.now() / 1000) // Set issued at timestamp
+            
           };
          const access_token= jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET,{
             expiresIn: '15m', // create an access cookie for authorization  
@@ -89,7 +94,7 @@ async function login(req,res){
                 });
 
             case "Admin":
-                sendCookie(payload,rememberMe,res); // Set the refresh token cookie
+                sendCookie(payload2,rememberMe,res); // Set the refresh token cookie
                 return res.json({
                     message: "Logged in as an admin",
                     accessToken: access_token

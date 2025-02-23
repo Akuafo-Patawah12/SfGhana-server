@@ -18,9 +18,9 @@ const router = require("./Router/Router")
 
 
 app.use(cors({
-    origin:["https://sgf-logistics.vercel.app/"],
+    origin:["https://sgf-logistics.vercel.app"],
     credentials: true,
-    methods:["POST,GET,PUT,DELETE"], 
+    methods:["POST,GET,PUT,DELETE,OPTIONS"], 
     allowedHeaders: ["Content-Type"] // Common headers
 }))
 
@@ -50,7 +50,7 @@ const server= http.createServer(app)
 initializeSocket(server)  // This function return all the websockets
 
 
-const port= process.env.PORT || 4040
+const port= process.env.PORT || 5000
 
 async function start_Server(){
 try{

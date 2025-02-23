@@ -30,22 +30,23 @@ function initializeSocket(server){
         
         if (!cookieHeader) {  //checking of the cookie exist in the headers
           
-          return next(new Error('No cookies found'));
+          return next(new Error('Refresh token expired'));
         }
       
-       
+        if (cookieHeader) {
           const cookies = cookie.parse(cookieHeader); // Parse cookies from the header
           const token = cookies.refreshToken; // Extract the refresh token
-          if (!token) return next(new Error('404: Refresh token not found'));
+          if (!token) return next(new Error('Refresh token expired'));
     
            //decoding the token to extract user information
           jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => { 
-            if (err) return next(new Error("404: Refresh token not found"));
+            if (err) return next(new Error("Refresh token expired"));
             socket.user = user; // Attach user to the socket
-            console.log(socket.user)
             next(); //proceed if there's no error
           });
-        
+        } else {
+          next(new Error('Refresh token expired'));
+        }
       }
 
       const trackingNamespace= io.of("/tracking")
@@ -61,43 +62,40 @@ function initializeSocket(server){
       trackingNamespace.use((socket,next)=>{
         middleware(socket,next)
       })
-      trackingNamespace.use((socket,next)=>{
-        middleware(socket,next)
-      })
-     
+      
       ordersNamespace.use((socket,next)=>{
          middleware(socket,next)
       })
 
-      shipmentNamespace.use((socket,next)=>{
-        const cookieHeader = socket.request.headers.cookie; //getting http only cookies from socket
-        
-        if (!cookieHeader) {  //checking of the cookie exist in the headers
-          
-          return next(new Error('No cookies found'));
-        }
       
-       
-          const cookies = cookie.parse(cookieHeader); // Parse cookies from the header
-          const token = cookies.refreshToken; // Extract the refresh token
-          if (!token) return next(new Error('404: Refresh token not found'));
-    
-           //decoding the token to extract user information
-          jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => { 
-            if (err) return next(new Error("404: Refresh token not found"));
-            socket.user = user; // Attach user to the socket
-            if (socket.user.role !== "Admin") {
-              return next(new Error(`403: Unauthorized role ${socket.user}`));
-            }
-            next(); //proceed if there's no error
-          });
-     })
 
       adminNamespace.use((socket,next)=>{
         middleware(socket,next)
      })
 
+     shipmentNamespace.use((socket,next)=>{
+      const cookieHeader = socket.request.headers.cookie; //getting http only cookies from socket
+      
+      if (!cookieHeader) {  //checking of the cookie exist in the headers
+        
+        return next(new Error('No cookies found'));
+      }
+    
      
+        const cookies = cookie.parse(cookieHeader); // Parse cookies from the header
+        const token = cookies.refreshToken; // Extract the refresh token
+        if (!token) return next(new Error('404: Refresh token not found'));
+  
+         //decoding the token to extract user information
+        jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, user) => { 
+          if (err) return next(new Error("404: Refresh token not found"));
+          socket.user = user; // Attach user to the socket
+          if (socket.user.role !== "Admin") {
+            return next(new Error(`403: Unauthorized`));
+          }
+          next(); //proceed if there's no error
+        });
+   })
 
      function setUser(socket){
       const userId=socket.user.id  // Extracting users id from socket
@@ -131,7 +129,6 @@ function initializeSocket(server){
       })
 
       shipmentNamespace.on("connection",(socket)=>{
-        console.log(socket.user.role)
         setUser(socket)
         Shipping(socket,shipmentNamespace,users)
 
@@ -147,7 +144,6 @@ function initializeSocket(server){
       
 
       ordersNamespace.on("connection",(socket)=>{
-         console.log(socket.user)
           orderFunc(socket,adminNamespace,users)
         console.log("connected to the order namespace")
       })

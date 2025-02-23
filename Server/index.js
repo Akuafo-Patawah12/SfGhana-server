@@ -17,18 +17,12 @@ const router = require("./Router/Router")
 
 
 
-const corsOptions = {
-  origin: "https://sgf-logistics.vercel.app",
-  methods: ["GET", "POST", "DELETE", "PUT", "OPTIONS"],  // ✅ Add OPTIONS
-  allowedHeaders: ["Content-Type", "Authorization"],  // ✅ Allow required headers
-  credentials: true
-};
-
-app.use(cors(corsOptions));
-
-
-
-
+app.use(cors({
+    origin:["https://sgf-logistics.vercel.app/"],
+    credentials: true,
+    methods:["POST,GET,PUT,DELETE"], 
+    allowedHeaders: ["Content-Type"] // Common headers
+}))
 
 
   
@@ -47,20 +41,16 @@ app.post('/add-admin', async (req, res) => {
     }
   });
 
-  app.get('/new', (req, res) => {
-    res.send('Hello World');
-  });
   
-  app.post("/test", (req, res) => {
-    res.json({ message: "POST request received" });
-});   
+  
+     
 
 const server= http.createServer(app)
 
 initializeSocket(server)  // This function return all the websockets
 
 
-const port= process.env.PORT || 5000
+const port= process.env.PORT || 4040
 
 async function start_Server(){
 try{

@@ -4,7 +4,7 @@ const jwt= require("jsonwebtoken");
 const orderFunc = require("./OrdersNamespace");
 const AdminPath = require("./AdminNamespace");
 const Tracking = require("./TrackingNamespace");
-const Shipping = require("./ShipmetNamespace");
+const Shipping = require("./ShipmentNamespace");
 
 
 

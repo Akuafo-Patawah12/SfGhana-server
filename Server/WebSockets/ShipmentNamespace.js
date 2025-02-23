@@ -1,5 +1,5 @@
 const Shipment= require("../Models/Order")
-const Shipments= require("../Models/ShippmentSchema")
+
 const Container= require("../Models/Container")
 const mongoose = require("mongoose")
 
@@ -92,20 +92,7 @@ socket.on("deleteShipments", async (data,callback) => {
     }
   });
 
-socket.on("create_shipment",async(data,callback)=>{
-  try {
-    const newShipment = new Shipments(data);
-    await newShipment.save();
 
-    // Emit the new shipment to all clients
-    io.emit("newShipment", newShipment);
-    callback({status:"ok",message:"Shipment created"})
-  } catch (error) {
-    console.log(error)
-    callback({status:"error" , message: "failed create shipment" });
-  }
-
-})
 
   socket.on("assign_container", async(data,callback)=>{
     try {

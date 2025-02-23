@@ -37,6 +37,7 @@ const addCBM= async (req, res) => {
     // Update the order with CBM and calculated amount
     order.items[0].cbm = parseInt(cbm);
     order.items[0].amount = amount;
+    order.selected_country= container.port
     order.route= container.route
     await order.save();
     const newData= { newCBM:cbm,selectedOrder: selectedOrder}
